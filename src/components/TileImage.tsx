@@ -22,7 +22,7 @@ export default function TileImage({
   className = '',
 }: TileImageProps) {
   const { suit, value } = tileFromIndex(tile);
-  const src = `/tiles/${value}${suit}.png`;
+  const src = `${import.meta.env.BASE_URL}tiles/${value}${suit}.png`;
 
   let borderColor = '#2c3e50';
   if (selected) borderColor = '#27ae60';
@@ -49,7 +49,7 @@ export default function TileImage({
 export function BackTile({ width = 40, height = 56 }: { width?: number; height?: number }) {
   return (
     <img
-      src="/tiles/back.png"
+      src={`${import.meta.env.BASE_URL}tiles/back.png`}
       alt="Back tile"
       width={width}
       height={height}
