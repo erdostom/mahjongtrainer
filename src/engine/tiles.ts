@@ -131,3 +131,12 @@ export function handTotal(hand: number[]): number {
 export function cloneHand(hand: number[]): number[] {
   return hand.slice();
 }
+
+export function drawTile(hand: number[], wall: number[]): TileIndex | null {
+  const pool = handToTileIndices(wall);
+  if (pool.length === 0) return null;
+  const tile = pool[randomInt(pool.length)];
+  wall[tile]--;
+  hand[tile]++;
+  return tile;
+}

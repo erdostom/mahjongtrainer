@@ -3,8 +3,13 @@
 import { useEffect, useState } from 'react';
 import Hand from '../components/Hand';
 import { generateEfficiencyHand } from '../engine/generate';
-import { calculateDiscardUkeire, evaluateBestDiscard, isOptimalDiscard, type UkeireResult } from '../engine/ukeire';
-import { tileFromIndex, type TileIndex } from '../engine/tiles';
+import { calculateStandardShanten } from '../engine/shanten';
+import {
+  calculateDiscardUkeire,
+  evaluateBestDiscard,
+  type UkeireResult,
+} from '../engine/ukeire';
+import { drawTile, handToTileIndices, sortTileIndices, tileFromIndex, type TileIndex } from '../engine/tiles';
 import {
   loadEfficiencyAttempts,
   saveEfficiencyAttempts,
@@ -12,34 +17,68 @@ import {
 } from '../storage';
 import './EfficiencyMode.css';
 
+interface DiscardResult {
+  chosenTile: TileIndex;
+  bestTile: TileIndex;
+  chosenUkeire: number;
+  bestUkeire: number;
+  optimal: boolean;
+  options: { tile: TileIndex; value: number }[];
+}
+
 export default function EfficiencyMode() {
   const [handTiles, setHandTiles] = useState<TileIndex[]>([]);
+  const [handCounts, setHandCounts] = useState<number[]>([]);
+  const [wallCounts, setWallCounts] = useState<number[]>([]);
   const [ukeire, setUkeire] = useState<UkeireResult[]>([]);
-  const [answered, setAnswered] = useState(false);
-  const [chosenTile, setChosenTile] = useState<TileIndex | null>(null);
   const [bestTile, setBestTile] = useState<TileIndex | null>(null);
+  const [handTenpai, setHandTenpai] = useState(false);
+  const [lastDiscard, setLastDiscard] = useState<DiscardResult | null>(null);
+  const [roundComplete, setRoundComplete] = useState(false);
+  const [roundDiscards, setRoundDiscards] = useState<DiscardResult[]>([]);
   const [attempts, setAttempts] = useState<EfficiencyAttempt[]>(loadEfficiencyAttempts());
 
   useEffect(() => {
-    newHand();
+    newRound();
   }, []);
 
-  function newHand() {
+  function newRound() {
     const result = generateEfficiencyHand();
-    setHandTiles(result.handTiles);
     const discards = calculateDiscardUkeire(result.hand, result.wall);
-    setUkeire(discards);
     const best = evaluateBestDiscard(discards);
+    const tenpai = calculateStandardShanten(result.hand) === 0;
+
+    setHandTiles(result.handTiles);
+    setHandCounts(result.hand);
+    setWallCounts(result.wall);
+    setUkeire(discards);
     setBestTile(best);
-    setAnswered(false);
-    setChosenTile(null);
+    setHandTenpai(tenpai);
+    setLastDiscard(null);
+    setRoundDiscards([]);
+    setRoundComplete(tenpai);
   }
 
   function handleTileClick(tile: TileIndex) {
-    if (answered || bestTile === null) return;
+    if (roundComplete || bestTile === null) return;
 
     const chosenUkeire = ukeire[tile].value;
     const bestUkeire = ukeire[bestTile].value;
+    const optimal = chosenUkeire === bestUkeire;
+
+    const options = handTiles
+      .filter((t, i, arr) => arr.indexOf(t) === i)
+      .map(t => ({ tile: t, value: ukeire[t]?.value ?? 0 }))
+      .sort((a, b) => b.value - a.value);
+
+    const result: DiscardResult = {
+      chosenTile: tile,
+      bestTile,
+      chosenUkeire,
+      bestUkeire,
+      optimal,
+      options,
+    };
 
     const attempt: EfficiencyAttempt = {
       timestamp: Date.now(),
@@ -48,40 +87,80 @@ export default function EfficiencyMode() {
       chosenUkeire,
       bestUkeire,
     };
+    const updatedAttempts = [...attempts, attempt];
+    setAttempts(updatedAttempts);
+    saveEfficiencyAttempts(updatedAttempts);
 
-    const updated = [...attempts, attempt];
-    setAttempts(updated);
-    saveEfficiencyAttempts(updated);
+    const newRoundDiscards = [...roundDiscards, result];
+    setRoundDiscards(newRoundDiscards);
+    setLastDiscard(result);
 
-    setChosenTile(tile);
-    setAnswered(true);
+    let newHand = handCounts.slice();
+    let newWall = wallCounts.slice();
+    newHand[tile]--;
+
+    const shantenAfterDiscard = calculateStandardShanten(newHand);
+    const wallEmpty = handToTileIndices(newWall).length === 0;
+
+    if (shantenAfterDiscard === 0 || wallEmpty) {
+      const finalTenpai = shantenAfterDiscard === 0;
+      setHandCounts(newHand);
+      setHandTiles(sortTileIndices(handToTileIndices(newHand)));
+      setHandTenpai(finalTenpai);
+      setRoundComplete(true);
+      return;
+    }
+
+    const drawn = drawTile(newHand, newWall);
+    if (drawn === null) {
+      setHandCounts(newHand);
+      setHandTiles(sortTileIndices(handToTileIndices(newHand)));
+      setHandTenpai(false);
+      setRoundComplete(true);
+      return;
+    }
+
+    const tenpai = calculateStandardShanten(newHand) === 0;
+    const newDiscards = calculateDiscardUkeire(newHand, newWall);
+    const newBest = evaluateBestDiscard(newDiscards);
+    setHandTiles(sortTileIndices(handToTileIndices(newHand)));
+    setHandCounts(newHand);
+    setWallCounts(newWall);
+    setUkeire(newDiscards);
+    setBestTile(newBest);
+    setHandTenpai(tenpai);
+
+    if (tenpai) {
+      setRoundComplete(true);
+    }
   }
 
-  const sortedDiscards = handTiles
-    .filter((tile, index, arr) => arr.indexOf(tile) === index)
-    .map(tile => ({ tile, value: ukeire[tile]?.value ?? 0 }))
-    .sort((a, b) => b.value - a.value);
+  const optimalCount = roundDiscards.filter(d => d.optimal).length;
 
   return (
     <div className="efficiency-mode">
       <div className="mode-description">
-        Click the tile that gives the best discard (most ukeire / tile acceptance).
+        {roundComplete
+          ? handTenpai
+            ? 'Tenpai! Round complete.'
+            : 'Round complete.'
+          : 'Discard tiles to maximize ukeire. The round continues until your hand is tenpai.'}
       </div>
 
-      <Hand tiles={handTiles} onTileClick={handleTileClick} disabled={answered} />
+      <Hand tiles={handTiles} onTileClick={handleTileClick} disabled={roundComplete} />
 
-      {answered && chosenTile !== null && bestTile !== null && (
+      {lastDiscard && (
         <div className="result-panel">
-          <div className={isOptimalDiscard(chosenTile, ukeire) ? 'correct' : 'incorrect'}>
-            {isOptimalDiscard(chosenTile, ukeire)
-              ? 'Correct! Best discard.'
-              : `Not optimal. Best was ${tileLabel(bestTile)} with ${ukeire[bestTile].value} ukeire.`}
+          <div className={lastDiscard.optimal ? 'correct' : 'incorrect'}>
+            {lastDiscard.optimal
+              ? `Correct! ${tileLabel(lastDiscard.chosenTile)} is best (${lastDiscard.chosenUkeire} ukeire).`
+              : `You chose ${tileLabel(lastDiscard.chosenTile)} (${lastDiscard.chosenUkeire} ukeire). Best was ${tileLabel(lastDiscard.bestTile)} (${lastDiscard.bestUkeire} ukeire).`}
           </div>
           <div className="ukeire-table">
-            {sortedDiscards.map(({ tile, value }) => (
+            {lastDiscard.options.map(({ tile, value }) => (
               <div
                 key={tile}
-                className={`ukeire-row ${tile === chosenTile ? 'chosen' : ''} ${tile === bestTile ? 'best' : ''}`}
+                className={`ukeire-row ${tile === lastDiscard.chosenTile ? 'chosen' : ''} ${tile === lastDiscard.bestTile ? 'best' : ''}`}
               >
                 <span className="tile-name">{tileLabel(tile)}</span>
                 <span className="ukeire-value">{value} ukeire</span>
@@ -91,8 +170,14 @@ export default function EfficiencyMode() {
         </div>
       )}
 
-      <button className="primary-button" onClick={newHand}>
-        Next Hand
+      {roundComplete && (
+        <div className="round-summary">
+          {roundDiscards.length} discards, {optimalCount} optimal.
+        </div>
+      )}
+
+      <button className="primary-button" onClick={newRound}>
+        {roundComplete ? 'Next Hand' : 'New Hand'}
       </button>
 
       <div className="stats-summary">
