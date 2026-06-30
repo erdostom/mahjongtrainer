@@ -2,15 +2,15 @@
   "name": "Mahjong Trainer",
   "short_name": "MJ Trainer",
   "description": "Offline Riichi Mahjong efficiency and chinitsu waits trainer.",
-  "start_url": "/",
+  "start_url": "/mahjongtrainer/",
   "display": "standalone",
   "background_color": "#1a472a",
   "theme_color": "#1a472a",
   "orientation": "portrait",
-  "scope": "/",
+  "scope": "/mahjongtrainer/",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     }
