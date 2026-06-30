@@ -37,9 +37,9 @@ function App() {
         {mode === 'stats' && <StatsMode />}
       </main>
       <footer className="app-footer">
-        <a href="/LICENSE" target="_blank" rel="noopener">GPL-3.0</a> •
+        <a href={`${import.meta.env.BASE_URL}LICENSE`} target="_blank" rel="noopener">GPL-3.0</a> •
         {' '}
-        <a href="/ATTRIBUTION.md" target="_blank" rel="noopener">Attribution</a>
+        <a href={`${import.meta.env.BASE_URL}ATTRIBUTION.md`} target="_blank" rel="noopener">Attribution</a>
       </footer>
     </div>
   );
