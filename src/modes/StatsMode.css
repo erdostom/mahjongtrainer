@@ -1,0 +1,56 @@
+.stats-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.stats-mode h2 {
+  margin-bottom: 0.25rem;
+}
+
+.stats-section {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.stats-section h3 {
+  margin: 0 0 0.5rem;
+  color: #1a472a;
+}
+
+.stats-section p {
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.chart {
+  margin-top: 1rem;
+}
+
+.chart-title {
+  font-size: 0.9rem;
+  color: #444;
+  margin-bottom: 0.5rem;
+}
+
+.chart-svg {
+  background: #fafaf8;
+  border-radius: 4px;
+}
+
+.clear-stats-button {
+  align-self: center;
+  background: #c0392b;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.clear-stats-button:hover {
+  background: #a93226;
+}
