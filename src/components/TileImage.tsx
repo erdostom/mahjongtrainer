@@ -37,7 +37,7 @@ export default function TileImage({
       className={className}
       style={{
         display: 'block',
-        border: `${selected || incorrect ? 3 : 2}px solid ${borderColor}`,
+        border: `${selected || incorrect ? 5 : 2}px solid ${borderColor}`,
         borderRadius: '4px',
         backgroundColor: '#fff',
         boxShadow: '0 2px 2px rgba(0,0,0,0.15)',

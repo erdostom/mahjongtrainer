@@ -26,11 +26,20 @@ export default function ChinitsuMode() {
   const [selected, setSelected] = useState<Set<TileIndex>>(new Set());
   const [answered, setAnswered] = useState(false);
   const [startTime, setStartTime] = useState<number>(0);
+  const [elapsedMs, setElapsedMs] = useState(0);
   const [attempts, setAttempts] = useState<ChinitsuAttempt[]>(loadChinitsuAttempts());
 
   useEffect(() => {
     newHand();
   }, []);
+
+  useEffect(() => {
+    if (answered) return;
+    const interval = setInterval(() => {
+      setElapsedMs(Date.now() - startTime);
+    }, 100);
+    return () => clearInterval(interval);
+  }, [answered, startTime]);
 
   function newHand() {
     const result = generateChinitsuHand();
@@ -40,6 +49,7 @@ export default function ChinitsuMode() {
     setSelected(new Set());
     setAnswered(false);
     setStartTime(Date.now());
+    setElapsedMs(0);
   }
 
   function toggleTile(tile: TileIndex) {
@@ -81,6 +91,8 @@ export default function ChinitsuMode() {
       <div className="mode-description">
         Select all tiles this single-suit hand is waiting on.
       </div>
+
+      <div className="timer">{formatTime(elapsedMs)}</div>
 
       <div className="hand-display">
         {handTiles.map((tile, index) => (
@@ -125,6 +137,7 @@ export default function ChinitsuMode() {
           <div className="waits-list">
             Waits: {waits.map(t => tileLabel(t)).join(', ')}
           </div>
+          <div className="time-result">Time: {formatTime(elapsedMs)}</div>
         </div>
       )}
 
@@ -134,6 +147,11 @@ export default function ChinitsuMode() {
       </div>
     </div>
   );
+}
+
+function formatTime(ms: number): string {
+  const seconds = ms / 1000;
+  return seconds.toFixed(1) + 's';
 }
 
 function tileLabel(tile: TileIndex): string {
