@@ -57,7 +57,7 @@ export default function EfficiencyMode() {
     setHandTenpai(tenpai);
     setLastDiscard(null);
     setRoundDiscards([]);
-    setRoundComplete(tenpai);
+    setRoundComplete(false);
   }
 
   function handleTileClick(tile: TileIndex, index: number) {
@@ -135,10 +135,6 @@ export default function EfficiencyMode() {
     setUkeire(newDiscards);
     setBestTile(newBest);
     setHandTenpai(tenpai);
-
-    if (tenpai) {
-      setRoundComplete(true);
-    }
   }
 
   const optimalCount = roundDiscards.filter(d => d.optimal).length;
