@@ -7,7 +7,7 @@ interface TileImageProps {
   tile: TileIndex;
   width?: number;
   height?: number;
-  highlighted?: boolean;
+  drawn?: boolean;
   selected?: boolean;
   incorrect?: boolean;
   className?: string;
@@ -17,6 +17,7 @@ export default function TileImage({
   tile,
   width = 40,
   height = 56,
+  drawn = false,
   selected = false,
   incorrect = false,
   className = '',
@@ -25,8 +26,19 @@ export default function TileImage({
   const src = `${import.meta.env.BASE_URL}tiles/${value}${suit}.png`;
 
   let borderColor = '#2c3e50';
-  if (selected) borderColor = '#27ae60';
-  if (incorrect) borderColor = '#c0392b';
+  let borderWidth = 2;
+  if (selected) {
+    borderColor = '#27ae60';
+    borderWidth = 5;
+  }
+  if (incorrect) {
+    borderColor = '#c0392b';
+    borderWidth = 5;
+  }
+  if (drawn) {
+    borderColor = '#2980b9';
+    borderWidth = 4;
+  }
 
   return (
     <img
@@ -37,7 +49,7 @@ export default function TileImage({
       className={className}
       style={{
         display: 'block',
-        border: `${selected || incorrect ? 5 : 2}px solid ${borderColor}`,
+        border: `${borderWidth}px solid ${borderColor}`,
         borderRadius: '4px',
         backgroundColor: '#fff',
         boxShadow: '0 2px 2px rgba(0,0,0,0.15)',

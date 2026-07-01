@@ -117,6 +117,11 @@ export function generateChinitsuHand(): ChinitsuHand {
   }
 }
 
-export function generateEfficiencyHand(): { hand: number[]; handTiles: TileIndex[]; wall: number[] } {
-  return generateRandomHand(13, SUITS);
+export function generateEfficiencyHand(): { hand: number[]; handTiles: TileIndex[]; wall: number[]; drawnIndex: number } {
+  while (true) {
+    const result = generateRandomHand(14, SUITS);
+    if (calculateStandardShanten(result.hand) !== -1) {
+      return { ...result, drawnIndex: result.handTiles.length - 1 };
+    }
+  }
 }

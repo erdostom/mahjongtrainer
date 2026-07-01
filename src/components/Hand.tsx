@@ -6,12 +6,13 @@ import './Hand.css';
 
 interface HandProps {
   tiles: TileIndex[];
+  drawnIndex?: number;
   onTileClick?: (tile: TileIndex, index: number) => void;
   disabled?: boolean;
   className?: string;
 }
 
-export default function Hand({ tiles, onTileClick, disabled = false, className = '' }: HandProps) {
+export default function Hand({ tiles, drawnIndex, onTileClick, disabled = false, className = '' }: HandProps) {
   return (
     <div className={`hand ${className}`}>
       {tiles.map((tile, index) => (
@@ -22,7 +23,7 @@ export default function Hand({ tiles, onTileClick, disabled = false, className =
           disabled={disabled || !onTileClick}
           aria-label={`Tile ${tile}`}
         >
-          <TileImage tile={tile} />
+          <TileImage tile={tile} drawn={index === drawnIndex} />
         </button>
       ))}
     </div>

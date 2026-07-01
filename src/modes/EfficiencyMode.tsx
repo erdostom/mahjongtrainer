@@ -28,8 +28,8 @@ interface DiscardResult {
 
 export default function EfficiencyMode() {
   const [handTiles, setHandTiles] = useState<TileIndex[]>([]);
-  const [handCounts, setHandCounts] = useState<number[]>([]);
   const [wallCounts, setWallCounts] = useState<number[]>([]);
+  const [drawnIndex, setDrawnIndex] = useState<number>(13);
   const [ukeire, setUkeire] = useState<UkeireResult[]>([]);
   const [bestTile, setBestTile] = useState<TileIndex | null>(null);
   const [handTenpai, setHandTenpai] = useState(false);
@@ -44,13 +44,14 @@ export default function EfficiencyMode() {
 
   function newRound() {
     const result = generateEfficiencyHand();
-    const discards = calculateDiscardUkeire(result.hand, result.wall);
+    const handCounts = tileCountsFromTiles(result.handTiles);
+    const discards = calculateDiscardUkeire(handCounts, result.wall);
     const best = evaluateBestDiscard(discards);
-    const tenpai = calculateStandardShanten(result.hand) === 0;
+    const tenpai = calculateStandardShanten(handCounts) === 0;
 
     setHandTiles(result.handTiles);
-    setHandCounts(result.hand);
     setWallCounts(result.wall);
+    setDrawnIndex(result.drawnIndex);
     setUkeire(discards);
     setBestTile(best);
     setHandTenpai(tenpai);
@@ -59,7 +60,7 @@ export default function EfficiencyMode() {
     setRoundComplete(tenpai);
   }
 
-  function handleTileClick(tile: TileIndex) {
+  function handleTileClick(tile: TileIndex, index: number) {
     if (roundComplete || bestTile === null) return;
 
     const chosenUkeire = ukeire[tile].value;
@@ -95,37 +96,42 @@ export default function EfficiencyMode() {
     setRoundDiscards(newRoundDiscards);
     setLastDiscard(result);
 
-    let newHand = handCounts.slice();
-    let newWall = wallCounts.slice();
-    newHand[tile]--;
+    let newHandTiles = handTiles.slice();
+    newHandTiles.splice(index, 1);
+    newHandTiles = sortTileIndices(newHandTiles);
 
-    const shantenAfterDiscard = calculateStandardShanten(newHand);
-    const wallEmpty = handToTileIndices(newWall).length === 0;
+    const handCounts13 = tileCountsFromTiles(newHandTiles);
+    const shantenAfterDiscard = calculateStandardShanten(handCounts13);
+    const wallEmpty = handToTileIndices(wallCounts).length === 0;
 
     if (shantenAfterDiscard === 0 || wallEmpty) {
-      const finalTenpai = shantenAfterDiscard === 0;
-      setHandCounts(newHand);
-      setHandTiles(sortTileIndices(handToTileIndices(newHand)));
-      setHandTenpai(finalTenpai);
+      setHandTiles(newHandTiles);
+      setDrawnIndex(-1);
+      setHandTenpai(shantenAfterDiscard === 0);
       setRoundComplete(true);
       return;
     }
 
-    const drawn = drawTile(newHand, newWall);
+    let wallCopy = wallCounts.slice();
+    const handCounts13ForDraw = tileCountsFromTiles(newHandTiles);
+    const drawn = drawTile(handCounts13ForDraw, wallCopy);
     if (drawn === null) {
-      setHandCounts(newHand);
-      setHandTiles(sortTileIndices(handToTileIndices(newHand)));
+      setHandTiles(newHandTiles);
+      setDrawnIndex(-1);
       setHandTenpai(false);
       setRoundComplete(true);
       return;
     }
 
-    const tenpai = calculateStandardShanten(newHand) === 0;
-    const newDiscards = calculateDiscardUkeire(newHand, newWall);
+    newHandTiles.push(drawn);
+    const handCounts14 = tileCountsFromTiles(newHandTiles);
+    const tenpai = calculateStandardShanten(handCounts14) === 0;
+    const newDiscards = calculateDiscardUkeire(handCounts14, wallCopy);
     const newBest = evaluateBestDiscard(newDiscards);
-    setHandTiles(sortTileIndices(handToTileIndices(newHand)));
-    setHandCounts(newHand);
-    setWallCounts(newWall);
+
+    setHandTiles(newHandTiles);
+    setWallCounts(wallCopy);
+    setDrawnIndex(newHandTiles.length - 1);
     setUkeire(newDiscards);
     setBestTile(newBest);
     setHandTenpai(tenpai);
@@ -147,7 +153,7 @@ export default function EfficiencyMode() {
           : 'Discard tiles to maximize ukeire. The round continues until your hand is tenpai.'}
       </div>
 
-      <Hand tiles={handTiles} onTileClick={handleTileClick} disabled={roundComplete} />
+      <Hand tiles={handTiles} drawnIndex={drawnIndex} onTileClick={handleTileClick} disabled={roundComplete} />
 
       {lastDiscard && (
         <div className="result-panel">
@@ -172,7 +178,7 @@ export default function EfficiencyMode() {
 
       {roundComplete && (
         <div className="round-summary">
-          {roundDiscards.length} discards, {optimalCount} optimal.
+          Round complete. {roundDiscards.length} discards, {optimalCount} optimal.
         </div>
       )}
 
@@ -186,6 +192,14 @@ export default function EfficiencyMode() {
       </div>
     </div>
   );
+}
+
+function tileCountsFromTiles(tiles: TileIndex[]): number[] {
+  const counts = new Array(38).fill(0);
+  for (const tile of tiles) {
+    counts[tile]++;
+  }
+  return counts;
 }
 
 function tileLabel(tile: TileIndex): string {
