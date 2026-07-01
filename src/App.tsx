@@ -37,6 +37,10 @@ function App() {
         {mode === 'stats' && <StatsMode />}
       </main>
       <footer className="app-footer">
+        <a href="https://github.com/erdostom/mahjongtrainer" target="_blank" rel="noopener">GitHub</a> •
+        {' '}
+        <a href="https://twitter.com/tamas" target="_blank" rel="noopener">Twitter</a> •
+        {' '}
         <a href="https://github.com/erdostom/mahjongtrainer/blob/main/LICENSE" target="_blank" rel="noopener">GPL-3.0</a> •
         {' '}
         <a href="https://github.com/erdostom/mahjongtrainer/blob/main/ATTRIBUTION.md" target="_blank" rel="noopener">Attribution</a>
