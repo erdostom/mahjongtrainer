@@ -10,6 +10,7 @@ interface TileImageProps {
   drawn?: boolean;
   selected?: boolean;
   incorrect?: boolean;
+  missed?: boolean;
   className?: string;
 }
 
@@ -20,6 +21,7 @@ export default function TileImage({
   drawn = false,
   selected = false,
   incorrect = false,
+  missed = false,
   className = '',
 }: TileImageProps) {
   const { suit, value } = tileFromIndex(tile);
@@ -33,6 +35,10 @@ export default function TileImage({
   }
   if (incorrect) {
     borderColor = '#c0392b';
+    borderWidth = 5;
+  }
+  if (missed) {
+    borderColor = '#8B4513';
     borderWidth = 5;
   }
   if (drawn) {

@@ -105,6 +105,7 @@ export default function ChinitsuMode() {
           const isSelected = selected.has(tile);
           const isWait = waits.includes(tile);
           const isIncorrect = answered && isSelected && !isWait;
+          const isMissed = answered && isWait && !isSelected;
           return (
             <button
               key={tile}
@@ -114,8 +115,9 @@ export default function ChinitsuMode() {
             >
               <TileImage
                 tile={tile}
-                selected={isSelected || (answered && isWait)}
+                selected={isSelected}
                 incorrect={isIncorrect}
+                missed={isMissed}
               />
             </button>
           );
