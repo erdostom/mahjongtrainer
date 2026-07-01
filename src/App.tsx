@@ -19,6 +19,7 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1>Mahjong Trainer</h1>
+        <h3>Save this to your home screen to use in Offline mode</h3>
         <nav className="app-nav">
           {MODES.map(({ key, label }) => (
             <button
@@ -39,7 +40,7 @@ function App() {
       <footer className="app-footer">
         <a href="https://github.com/erdostom/mahjongtrainer" target="_blank" rel="noopener">GitHub</a> •
         {' '}
-        <a href="https://twitter.com/tamas" target="_blank" rel="noopener">Twitter</a> •
+        <a href="https://x.com/tamas" target="_blank" rel="noopener">Made with &lt;3 by Tamas</a> •
         {' '}
         <a href="https://github.com/erdostom/mahjongtrainer/blob/main/LICENSE" target="_blank" rel="noopener">GPL-3.0</a> •
         {' '}
