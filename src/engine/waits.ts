@@ -9,6 +9,7 @@ export function calculateWaits(hand: number[], suit: Suit): TileIndex[] {
   const handCopy = hand.slice();
 
   for (const index of suitTileIndices(suit)) {
+    if (handCopy[index] >= 4) continue;
     handCopy[index]++;
     if (calculateStandardShanten(handCopy) === -1) {
       waits.push(index);

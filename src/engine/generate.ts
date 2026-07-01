@@ -2,6 +2,7 @@
 // Random hand generation.
 
 import { calculateStandardShanten } from './shanten';
+import { calculateWaits } from './waits';
 import {
   handToTileIndices,
   newHandCounts,
@@ -101,15 +102,7 @@ export function generateChinitsuHand(): ChinitsuHand {
 
     if (calculateStandardShanten(hand) !== 0) continue;
 
-    const waits: TileIndex[] = [];
-    for (const value of [1, 2, 3, 4, 5, 6, 7, 8, 9]) {
-      const index = tileIndex(suit, value);
-      hand[index]++;
-      if (calculateStandardShanten(hand) === -1) {
-        waits.push(index);
-      }
-      hand[index]--;
-    }
+    const waits = calculateWaits(hand, suit);
 
     if (waits.length > 0) {
       return { hand, handTiles: sortTileIndices(handToTileIndices(hand)), waits, suit };
