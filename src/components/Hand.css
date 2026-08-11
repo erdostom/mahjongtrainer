@@ -1,9 +1,11 @@
 .hand {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
+  flex-wrap: nowrap;
+  gap: clamp(1px, 0.4vw, 0.4rem);
   justify-content: center;
-  padding: 0.5rem;
+  align-items: flex-start;
+  padding: 0.5rem 0;
+  width: 100%;
 }
 
 .hand-tile-button {
@@ -12,6 +14,14 @@
   padding: 0;
   cursor: pointer;
   transition: transform 0.1s ease;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 52px;
+}
+
+.hand-tile-button img {
+  width: 100% !important;
+  height: auto !important;
 }
 
 .hand-tile-button:hover:not(:disabled) {
