@@ -181,17 +181,19 @@ export default function EfficiencyMode() {
               ? `Correct! ${tileLabel(lastDiscard.chosenTile)} is best (${lastDiscard.chosenUkeire} ukeire).`
               : `You chose ${tileLabel(lastDiscard.chosenTile)} (${lastDiscard.chosenUkeire} ukeire). Best was ${tileLabel(lastDiscard.bestTile)} (${lastDiscard.bestUkeire} ukeire).`}
           </div>
-          <div className="ukeire-table">
-            {lastDiscard.options.map(({ tile, value }) => (
-              <div
-                key={tile}
-                className={`ukeire-row ${tile === lastDiscard.chosenTile ? 'chosen' : ''} ${tile === lastDiscard.bestTile ? 'best' : ''}`}
-              >
-                <span className="tile-name">{tileLabel(tile)}</span>
-                <span className="ukeire-value">{value} ukeire</span>
-              </div>
-            ))}
-          </div>
+          {!lastDiscard.optimal && (
+            <div className="ukeire-table">
+              {lastDiscard.options.map(({ tile, value }) => (
+                <div
+                  key={tile}
+                  className={`ukeire-row ${tile === lastDiscard.chosenTile ? 'chosen' : ''} ${tile === lastDiscard.bestTile ? 'best' : ''}`}
+                >
+                  <span className="tile-name">{tileLabel(tile)}</span>
+                  <span className="ukeire-value">{value} ukeire</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
