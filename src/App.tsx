@@ -2,6 +2,7 @@ import { useState } from 'react';
 import EfficiencyMode from './modes/EfficiencyMode';
 import ChinitsuMode from './modes/ChinitsuMode';
 import StatsMode from './modes/StatsMode';
+import InstallPrompt from './components/InstallPrompt';
 import './App.css';
 
 type Mode = 'efficiency' | 'chinitsu' | 'stats';
@@ -19,7 +20,7 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1>Mahjong Trainer</h1>
-        <h3>Save this to your home screen to use in Offline mode</h3>
+        <h3>Save this to your home screen to use in Offline mode <InstallPrompt /></h3>
         <nav className="app-nav">
           {MODES.map(({ key, label }) => (
             <button

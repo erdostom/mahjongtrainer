@@ -22,6 +22,64 @@
   color: #ddd;
 }
 
+.install-link {
+  display: inline-block;
+  margin-top: 0.4rem;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.install-link:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.install-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  margin-left: 0.4rem;
+  font-size: 0.85rem;
+  line-height: 1;
+  color: #fff;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.install-info:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.install-help-body {
+  margin: 0;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.install-help-body ol {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.install-help-body li {
+  margin-bottom: 0.35rem;
+}
+
+.install-help-body p {
+  margin: 0.75rem 0 0;
+  color: #555;
+}
+
 .app-nav {
   display: flex;
   justify-content: center;
