@@ -1,0 +1,35 @@
+.river {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+}
+
+.river-label {
+  font-size: 0.8rem;
+  color: #666;
+  white-space: nowrap;
+}
+
+.river-tiles {
+  display: grid;
+  grid-template-columns: repeat(6, auto);
+  gap: 0.25rem;
+  justify-content: center;
+}
+
+.river-tile-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: default;
+}
+
+.river-tile-button.suboptimal {
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.river-tile-button.suboptimal:hover:not(:disabled) {
+  transform: translateY(-3px);
+}

@@ -4,6 +4,12 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   base: '/mahjongtrainer/',
+  server: {
+    allowedHosts: ['artoo.tilapia-acrux.ts.net'],
+  },
+  preview: {
+    allowedHosts: ['artoo.tilapia-acrux.ts.net'],
+  },
   plugins: [
     react(),
     VitePWA({

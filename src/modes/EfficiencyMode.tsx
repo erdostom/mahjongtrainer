@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Hand from '../components/Hand';
+import River from '../components/River';
+import AcceptanceModal from './AcceptanceModal';
 import { generateEfficiencyHand } from '../engine/generate';
 import { calculateStandardShanten } from '../engine/shanten';
 import {
@@ -17,13 +19,21 @@ import {
 } from '../storage';
 import './EfficiencyMode.css';
 
-interface DiscardResult {
+export interface DiscardOption {
+  tile: TileIndex;
+  value: number;
+  accepted: { tile: TileIndex; remaining: number }[];
+}
+
+export interface DiscardResult {
   chosenTile: TileIndex;
   bestTile: TileIndex;
   chosenUkeire: number;
   bestUkeire: number;
   optimal: boolean;
-  options: { tile: TileIndex; value: number }[];
+  handTiles: TileIndex[];
+  drawnIndex: number;
+  options: DiscardOption[];
 }
 
 export default function EfficiencyMode() {
@@ -36,6 +46,7 @@ export default function EfficiencyMode() {
   const [lastDiscard, setLastDiscard] = useState<DiscardResult | null>(null);
   const [roundComplete, setRoundComplete] = useState(false);
   const [roundDiscards, setRoundDiscards] = useState<DiscardResult[]>([]);
+  const [analysisResult, setAnalysisResult] = useState<DiscardResult | null>(null);
   const [attempts, setAttempts] = useState<EfficiencyAttempt[]>(loadEfficiencyAttempts());
 
   useEffect(() => {
@@ -58,6 +69,7 @@ export default function EfficiencyMode() {
     setLastDiscard(null);
     setRoundDiscards([]);
     setRoundComplete(false);
+    setAnalysisResult(null);
   }
 
   function handleTileClick(tile: TileIndex, index: number) {
@@ -69,7 +81,14 @@ export default function EfficiencyMode() {
 
     const options = handTiles
       .filter((t, i, arr) => arr.indexOf(t) === i)
-      .map(t => ({ tile: t, value: ukeire[t]?.value ?? 0 }))
+      .map(t => ({
+        tile: t,
+        value: ukeire[t]?.value ?? 0,
+        accepted: (ukeire[t]?.tiles ?? []).map(acceptedTile => ({
+          tile: acceptedTile,
+          remaining: wallCounts[acceptedTile] ?? 0,
+        })),
+      }))
       .sort((a, b) => b.value - a.value);
 
     const result: DiscardResult = {
@@ -78,6 +97,8 @@ export default function EfficiencyMode() {
       chosenUkeire,
       bestUkeire,
       optimal,
+      handTiles: handTiles.slice(),
+      drawnIndex,
       options,
     };
 
@@ -151,6 +172,8 @@ export default function EfficiencyMode() {
 
       <Hand tiles={handTiles} drawnIndex={drawnIndex} onTileClick={handleTileClick} disabled={roundComplete} />
 
+      <River discards={roundDiscards} onSelect={setAnalysisResult} />
+
       {lastDiscard && (
         <div className="result-panel">
           <div className={lastDiscard.optimal ? 'correct' : 'incorrect'}>
@@ -181,6 +204,8 @@ export default function EfficiencyMode() {
       <button className="primary-button" onClick={newRound}>
         {roundComplete ? 'Next Hand' : 'New Hand'}
       </button>
+
+      {analysisResult && <AcceptanceModal result={analysisResult} onClose={() => setAnalysisResult(null)} />}
 
       <div className="stats-summary">
         Total attempts: {attempts.length} | Optimal:{' '}
