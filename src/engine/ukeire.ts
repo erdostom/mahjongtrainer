@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Ukeire (tile acceptance) calculation, adapted from Riichi-Trainer.
 
-import { calculateStandardShanten } from './shanten';
+import { calculateShanten } from './shanten';
 import { allTileIndices, type TileIndex, wallForAllTiles } from './tiles';
 
 export interface UkeireResult {
@@ -17,7 +17,7 @@ export function calculateUkeire(
   const handCopy = hand.slice();
 
   if (baseShanten === -2) {
-    baseShanten = calculateStandardShanten(handCopy);
+    baseShanten = calculateShanten(handCopy);
   }
 
   let value = 0;
@@ -27,7 +27,7 @@ export function calculateUkeire(
     if (remainingTiles[tile] === 0) continue;
 
     handCopy[tile]++;
-    if (calculateStandardShanten(handCopy, baseShanten - 1) < baseShanten) {
+    if (calculateShanten(handCopy, baseShanten - 1) < baseShanten) {
       value += remainingTiles[tile];
       tiles.push(tile);
     }
@@ -43,7 +43,7 @@ export function calculateDiscardUkeire(
 ): UkeireResult[] {
   const results: UkeireResult[] = new Array(38);
   const handCopy = hand.slice();
-  const baseShanten = calculateStandardShanten(handCopy);
+  const baseShanten = calculateShanten(handCopy);
 
   for (const tile of allTileIndices()) {
     if (handCopy[tile] === 0) {

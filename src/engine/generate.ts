@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Random hand generation.
 
-import { calculateStandardShanten } from './shanten';
+import { calculateShanten } from './shanten';
 import { calculateWaits } from './waits';
 import {
   handToTileIndices,
@@ -70,7 +70,7 @@ function generateSingleSuitWinningHand(suit: Suit): number[] {
       hand[tileIndex(suit, value)] = count;
     }
 
-    if (calculateStandardShanten(hand) === -1) {
+    if (calculateShanten(hand) === -1) {
       return hand;
     }
   }
@@ -88,7 +88,7 @@ export function generateChinitsuHand(): ChinitsuHand {
     const suit = randomSuit();
     const winningHand = generateSingleSuitWinningHand(suit);
 
-    if (calculateStandardShanten(winningHand) !== -1) continue;
+    if (calculateShanten(winningHand) !== -1) continue;
 
     const hand = winningHand.slice();
     const removable: TileIndex[] = [];
@@ -100,7 +100,7 @@ export function generateChinitsuHand(): ChinitsuHand {
     const removed = removable[randomInt(removable.length)];
     hand[removed]--;
 
-    if (calculateStandardShanten(hand) !== 0) continue;
+    if (calculateShanten(hand) !== 0) continue;
 
     const waits = calculateWaits(hand, suit);
 
@@ -113,7 +113,7 @@ export function generateChinitsuHand(): ChinitsuHand {
 export function generateEfficiencyHand(): { hand: number[]; handTiles: TileIndex[]; wall: number[]; drawnIndex: number } {
   while (true) {
     const result = generateRandomHand(14, SUITS);
-    if (calculateStandardShanten(result.hand) !== -1) {
+    if (calculateShanten(result.hand) !== -1) {
       return { ...result, drawnIndex: result.handTiles.length - 1 };
     }
   }

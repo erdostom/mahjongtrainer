@@ -5,7 +5,7 @@ import Hand from '../components/Hand';
 import River from '../components/River';
 import AcceptanceModal from './AcceptanceModal';
 import { generateEfficiencyHand } from '../engine/generate';
-import { calculateStandardShanten } from '../engine/shanten';
+import { calculateShanten } from '../engine/shanten';
 import {
   calculateDiscardUkeire,
   evaluateBestDiscard,
@@ -58,7 +58,7 @@ export default function EfficiencyMode() {
     const handCounts = tileCountsFromTiles(result.handTiles);
     const discards = calculateDiscardUkeire(handCounts, result.wall);
     const best = evaluateBestDiscard(discards);
-    const tenpai = calculateStandardShanten(handCounts) === 0;
+    const tenpai = calculateShanten(handCounts) === 0;
 
     setHandTiles(result.handTiles);
     setWallCounts(result.wall);
@@ -122,7 +122,7 @@ export default function EfficiencyMode() {
     newHandTiles = sortTileIndices(newHandTiles);
 
     const handCounts13 = tileCountsFromTiles(newHandTiles);
-    const shantenAfterDiscard = calculateStandardShanten(handCounts13);
+    const shantenAfterDiscard = calculateShanten(handCounts13);
     const wallEmpty = handToTileIndices(wallCounts).length === 0;
 
     if (shantenAfterDiscard === 0 || wallEmpty) {
@@ -146,7 +146,7 @@ export default function EfficiencyMode() {
 
     newHandTiles.push(drawn);
     const handCounts14 = tileCountsFromTiles(newHandTiles);
-    const tenpai = calculateStandardShanten(handCounts14) === 0;
+    const tenpai = calculateShanten(handCounts14) === 0;
     const newDiscards = calculateDiscardUkeire(handCounts14, wallCopy);
     const newBest = evaluateBestDiscard(newDiscards);
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Wait calculation for chinitsu hands.
+// Wait calculation for chinitsu hands (standard shape and seven pairs).
 
-import { calculateStandardShanten } from './shanten';
+import { calculateShanten } from './shanten';
 import { suitTileIndices, type Suit, type TileIndex } from './tiles';
 
 export function calculateWaits(hand: number[], suit: Suit): TileIndex[] {
@@ -11,7 +11,7 @@ export function calculateWaits(hand: number[], suit: Suit): TileIndex[] {
   for (const index of suitTileIndices(suit)) {
     if (handCopy[index] >= 4) continue;
     handCopy[index]++;
-    if (calculateStandardShanten(handCopy) === -1) {
+    if (calculateShanten(handCopy) === -1) {
       waits.push(index);
     }
     handCopy[index]--;
@@ -21,9 +21,9 @@ export function calculateWaits(hand: number[], suit: Suit): TileIndex[] {
 }
 
 export function isHandTenpai(hand: number[]): boolean {
-  return calculateStandardShanten(hand) === 0;
+  return calculateShanten(hand) === 0;
 }
 
 export function isHandComplete(hand: number[]): boolean {
-  return calculateStandardShanten(hand) === -1;
+  return calculateShanten(hand) === -1;
 }
